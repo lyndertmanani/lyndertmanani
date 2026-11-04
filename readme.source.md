@@ -106,16 +106,13 @@
 
   <div style={{ display:'flex', flexDirection:'column', marginLeft:168, gap:8, zIndex: 10 }}>
     <div style={{ display:'flex', fontSize:38, fontWeight:800, color:'#ffffff', letterSpacing:'-1px', lineHeight:1 }}>
-      {github?.user?.name || github?.user?.login || 'lyndertmanani' || 'Name'}
+      Lendert Eric Manani
     </div>
     <div style={{ display:'flex', fontSize:15, color:'rgba(180,165,255,0.8)', fontWeight:400, letterSpacing:'0.3px' }}>
-      {github?.user?.bio || 'Put here your bio'}
+      UI/UX Designer & Front-End Developer · Malawi
     </div>
     <div style={{ display:'flex', gap:8, marginTop:6, flexWrap: 'wrap' }}>
-      {((github && github.languages && github.languages.length > 0)
-        ? github.languages.slice(0, 4).map(function(l) { return l.name; })
-        : ['readme-aura', 'other technologies']
-      ).map(function(tag, i) {
+      {['Next.js', 'React', 'Figma', 'ericlyndert.com'].map(function(tag, i) {
         return (
           <div key={tag + '-' + i} style={{
             display:'flex', padding:'4px 12px', borderRadius:20,
