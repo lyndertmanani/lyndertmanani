@@ -14,29 +14,39 @@ TOKEN = os.environ["GITHUB_TOKEN"]
 QUERY = """
 query($login: String!) {
   user(login: $login) {
-    followers { totalCount }
-    repositories(ownerAffiliations: OWNER, isFork: false, first: 100, privacy: PUBLIC) {
-      totalCount
-      nodes {
-        stargazerCount
-        languages(first: 5, orderBy: {field: SIZE, direction: DESC}) { edges { size node { name color } } }
-      }
+    id
+    contributionsCollection {
+      totalCommitContributions
+      contributionCalendar { totalContributions }
     }
-    pullRequests { totalCount }
-    issues { totalCount }
-    contributionsCollection { totalCommitContributions contributionCalendar { totalContributions } }
+    repositoriesContributedTo(first: 100, includeUserRepositories: true, contributionTypes: [COMMIT]) {
+      totalCount
+      nodes { nameWithOwner }
+    }
   }
 }
 """
 
+HISTORY = """
+query($owner: String!, $name: String!, $id: ID!, $after: String) {
+  repository(owner: $owner, name: $name) {
+    defaultBranchRef { target { ... on Commit {
+      history(author: {id: $id}, first: 100, after: $after) {
+        pageInfo { hasNextPage endCursor }
+        nodes { additions deletions }
+      }
+    } } }
+  }
+}
+"""
 THEMES = {
     "dark": {"text": "#c9d1d9", "muted": "#8b949e", "accent": "#a371f7", "track": "#21262d"},
     "light": {"text": "#24292f", "muted": "#6e7781", "accent": "#8250df", "track": "#eaeef2"},
 }
 
 
-def fetch():
-    body = json.dumps({"query": QUERY, "variables": {"login": LOGIN}}).encode()
+def gql(query, variables):
+    body = json.dumps({"query": query, "variables": variables}).encode()
     req = urllib.request.Request(
         "https://api.github.com/graphql",
         data=body,
@@ -44,64 +54,73 @@ def fetch():
     )
     with urllib.request.urlopen(req, timeout=60) as resp:
         payload = json.load(resp)
-    if "errors" in payload:
+    if "errors" in payload and not payload.get("data"):
         raise SystemExit(json.dumps(payload["errors"], indent=2))
-    return payload["data"]["user"]
+    return payload["data"]
 
 
-def render(user, t):
-    repos = user["repositories"]["nodes"]
-    stars = sum(r["stargazerCount"] for r in repos)
+def lines_changed(user):
+    """Lines added and deleted in your commits on the default branch of every repo you contributed to."""
+    added = deleted = 0
+    for repo in user["repositoriesContributedTo"]["nodes"]:
+        owner, name = repo["nameWithOwner"].split("/")
+        after = None
+        for _page in range(30):
+            try:
+                data = gql(HISTORY, {"owner": owner, "name": name, "id": user["id"], "after": after})
+            except Exception:
+                break
+            ref = (data.get("repository") or {}).get("defaultBranchRef")
+            if not ref or not ref.get("target"):
+                break
+            hist = ref["target"]["history"]
+            for c in hist["nodes"]:
+                added += c["additions"]
+                deleted += c["deletions"]
+            if not hist["pageInfo"]["hasNextPage"]:
+                break
+            after = hist["pageInfo"]["endCursor"]
+    return added, deleted
+
+
+def fmt(n):
+    if n >= 1_000_000:
+        return f"{n / 1_000_000:.2f}M"
+    return f"{n / 1000:.1f}k" if n >= 10000 else f"{n:,}"
+
+
+def render(user, lines, t):
     cc = user["contributionsCollection"]
+    added, deleted = lines
     rows = [
-        ("Contributions (last year)", cc["contributionCalendar"]["totalContributions"]),
-        ("Commits (last year)", cc["totalCommitContributions"]),
-        ("Pull requests", user["pullRequests"]["totalCount"]),
-        ("Issues", user["issues"]["totalCount"]),
-        ("Public repos", user["repositories"]["totalCount"]),
-        ("Stars earned", stars),
-        ("Followers", user["followers"]["totalCount"]),
+        ("Repos contributed to", f'{user["repositoriesContributedTo"]["totalCount"]:,}'),
+        ("Contributions (last year)", f'{cc["contributionCalendar"]["totalContributions"]:,}'),
+        ("Commits (last year)", f'{cc["totalCommitContributions"]:,}'),
+        ("Lines of code changed", fmt(added + deleted)),
+        ("Lines added", "+" + fmt(added)),
+        ("Lines deleted", "-" + fmt(deleted)),
     ]
-
-    langs = {}
-    for r in repos:
-        for e in r["languages"]["edges"]:
-            name = e["node"]["name"]
-            size, color = langs.get(name, (0, e["node"]["color"] or "#8b949e"))
-            langs[name] = (size + e["size"], color)
-    top = sorted(langs.items(), key=lambda kv: -kv[1][0])[:6]
-    total = sum(s for _n, (s, _c) in top) or 1
-
-    width, row_h = 520, 24
-    height = 56 + max(len(rows), len(top) + 1) * row_h
+    width, row_h = 360, 26
+    height = 40 + len(rows) * row_h
     out = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
         'font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif">',
         f'<style>.h{{fill:{t["accent"]};font-size:16px;font-weight:600}}.l{{fill:{t["muted"]};font-size:13px}}'
         f'.v{{fill:{t["text"]};font-size:13px;font-weight:600}}</style>',
-        f'<text x="4" y="22" class="h">GitHub stats</text>',
-        f'<text x="290" y="22" class="h">Top languages</text>',
+        '<text x="4" y="22" class="h">GitHub stats</text>',
     ]
     for i, (label, value) in enumerate(rows):
         y = 52 + i * row_h
-        out.append(f'<text x="4" y="{y}" class="l">{label}</text><text x="230" y="{y}" class="v" text-anchor="end">{value:,}</text>')
-    for i, (name, (size, color)) in enumerate(top):
-        y = 52 + i * row_h
-        pct = size / total
-        out.append(
-            f'<text x="290" y="{y}" class="l">{name}</text><text x="{width - 4}" y="{y}" class="v" text-anchor="end">{pct:.0%}</text>'
-            f'<rect x="290" y="{y + 5}" width="{width - 294}" height="4" rx="2" fill="{t["track"]}"/>'
-            f'<rect x="290" y="{y + 5}" width="{(width - 294) * pct:.1f}" height="4" rx="2" fill="{color}"/>'
-        )
+        out.append(f'<text x="4" y="{y}" class="l">{label}</text><text x="{width - 4}" y="{y}" class="v" text-anchor="end">{value}</text>')
     out.append("</svg>")
     return "\n".join(out)
 
-
 def main():
-    user = fetch()
+    user = gql(QUERY, {"login": LOGIN})["user"]
+    lines = lines_changed(user)
     for name, t in THEMES.items():
         path = ROOT / f"stats_{name}.svg"
-        path.write_text(render(user, t), encoding="utf-8")
+        path.write_text(render(user, lines, t), encoding="utf-8")
         print(f"wrote {path.name}")
 
 

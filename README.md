@@ -11,8 +11,8 @@
 </a>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/lyndertmanani/lyndertmanani/main/stats_dark.svg?v=1">
-  <img alt="GitHub stats" src="https://raw.githubusercontent.com/lyndertmanani/lyndertmanani/main/stats_light.svg?v=1">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/lyndertmanani/lyndertmanani/main/stats_dark.svg?v=2">
+  <img alt="GitHub stats" src="https://raw.githubusercontent.com/lyndertmanani/lyndertmanani/main/stats_light.svg?v=2">
 </picture>
 
 [Website](https://www.ericlyndert.com) · [LinkedIn](https://www.linkedin.com/in/ericlyndert)
