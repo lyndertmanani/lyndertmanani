@@ -53,7 +53,10 @@ THEMES = {
 CELL, GAP = 11, 3
 PITCH = CELL + GAP
 LEFT, TOP = 36, 28
-STEP_SECONDS = 0.32
+STEP_SECONDS = 0.1
+PAD = 15
+TAIL = 16
+LAGS = (5, 8, 11)
 PAUSE_SECONDS = 3.0
 RESET = 0.985
 
@@ -84,44 +87,15 @@ def eating_order(weeks):
     return order
 
 
-def plan_path(order, seed):
-    """Wander the grid toward uneaten cells; returns the walk and the step each cell is first eaten."""
-    rng = random.Random(seed)
+def plan_path(order, weeks):
+    """Classic Pac-Man sweep: row by row, left to right then back, stepping down at each edge."""
     valid = {(w, r) for (w, r, *_rest) in order}
-    targets = {(w, r) for (w, r, c, _l, _d) in order if c > 0}
-    cur = min(valid)
-    path, eaten = [cur], {}
-    if cur in targets:
-        eaten[cur] = 0
-        targets.discard(cur)
-    heading = (1, 0)
-    while targets:
-        parent, dist, queue = {cur: None}, {cur: 0}, deque([cur])
-        while queue:
-            node = queue.popleft()
-            nbrs = [(node[0] + dx, node[1] + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))]
-            rng.shuffle(nbrs)
-            for nb in nbrs:
-                if nb in valid and nb not in parent:
-                    parent[nb], dist[nb] = node, dist[node] + 1
-                    queue.append(nb)
-        best = min(dist[c] for c in targets)
-        pool = [c for c in targets if dist[c] == best]
-        if rng.random() < 0.3:
-            pool = [c for c in targets if dist[c] <= best + 6] or pool
-        goal = rng.choice(sorted(pool))
-        leg = []
-        while goal != cur:
-            leg.append(goal)
-            goal = parent[goal]
-        for step in reversed(leg):
-            path.append(step)
-            if step in targets:
-                eaten[step] = len(path) - 1
-                targets.discard(step)
-        cur = path[-1]
+    path = []
+    for row in range(7):
+        cols = range(weeks) if row % 2 == 0 else range(weeks - 1, -1, -1)
+        path += [(c, row) for c in cols]
+    eaten = {cell: PAD + k for k, cell in enumerate(path) if cell in valid}
     return path, eaten
-
 
 def kt(value):
     return f"{min(max(value, 0.0), 1.0):.4f}"
@@ -132,7 +106,7 @@ def render(calendar, theme_name):
     weeks = calendar["weeks"]
     total = calendar["totalContributions"]
     order = eating_order(weeks)
-    path, eaten = plan_path(order, date.today().toordinal())
+    path, eaten = plan_path(order, len(weeks))
     n = len(path)
     move = n * STEP_SECONDS
     dur = move + PAUSE_SECONDS
@@ -174,14 +148,22 @@ def render(calendar, theme_name):
             f'values="{base};{empty};{base}" keyTimes="0;{kt(at(eaten[(w, row)]))};{RESET}"/></rect>'
         )
 
-    pos = [
-        (LEFT + w * PITCH + CELL / 2, TOP + row * PITCH + CELL / 2)
-        for (w, row) in path
-    ]
+    def cell_at(idx):
+        if idx < 0:
+            return path[0][0] + idx, path[0][1]
+        if idx >= len(path):
+            return path[-1][0] + idx - len(path) + 1, path[-1][1]
+        return path[idx]
+
+    def xy(idx):
+        c, r = cell_at(idx)
+        return LEFT + c * PITCH + CELL / 2, TOP + r * PITCH + CELL / 2
+
     keytimes = ";".join(kt(i / (n - 1) * frac) for i in range(n)) + ";1"
 
     def track(lag, dx, dy):
-        pts = [pos[max(i - lag, 0)] for i in range(n)] + [pos[-1]]
+        pts = [xy(max(i - PAD, 0) - lag) for i in range(n)]
+        pts.append(pts[-1])
         return ";".join(f"{x + dx:.1f} {y + dy:.1f}" for x, y in pts)
 
     def move(values):
@@ -191,16 +173,18 @@ def render(calendar, theme_name):
         )
 
     for k, color in reversed(list(enumerate(t["ghosts"]))):
+        stride = (0.34, 0.30, 0.38)[k]
         out.append(
-            f'<g>{move(track((5, 9, 14)[k], -8, -8))}'
-            f'<path d="{COPILOT_PATH}" fill="{color}" transform="scale(0.6667)"/></g>'
+            f'<g>{move(track(LAGS[k], 0, 0))}<g>'
+            f'<animateTransform attributeName="transform" type="translate" dur="{stride}s" repeatCount="indefinite" '
+            f'values="-8 -8;-8 -10.5;-8 -8"/>'
+            f'<path d="{COPILOT_PATH}" fill="{color}" transform="scale(0.6667)"/></g></g>'
         )
 
     angles = []
     for i in range(n):
-        j = min(i + 1, n - 1)
-        ddx, ddy = pos[j][0] - pos[i][0], pos[j][1] - pos[i][1]
-        angles.append(0 if ddx > 0 else (90 if ddy > 0 else 270 if ddy < 0 else (angles[-1] if angles else 0)))
+        (x1, y1), (x2, y2) = xy(max(i - PAD, 0)), xy(max(i - PAD, 0) + 1)
+        angles.append(0 if x2 > x1 else 180 if x2 < x1 else 90)
     angles.append(angles[-1])
     rot = ";".join(f"{a} 0 0" for a in angles)
     r = 7
@@ -211,7 +195,7 @@ def render(calendar, theme_name):
         f'<g><animateTransform attributeName="transform" type="rotate" calcMode="discrete" '
         f'dur="{dur:.2f}s" repeatCount="indefinite" values="{rot}" keyTimes="{keytimes}"/>'
         f'<path d="{open_d}" fill="{t["pac"]}">'
-        f'<animate attributeName="d" dur="0.3s" repeatCount="indefinite" values="{open_d};{shut_d};{open_d}"/></path></g></g>'
+        f'<animate attributeName="d" dur="0.24s" repeatCount="indefinite" values="{open_d};{shut_d};{open_d}"/></path></g></g>'
     )
     fy = TOP + 7 * PITCH + 30
     out.append(f'<text x="{LEFT}" y="{fy}" class="p">remaining contributions:</text>')
