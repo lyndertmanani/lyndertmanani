@@ -2,10 +2,10 @@
 <style>.h{fill:#8250df;font-size:16px;font-weight:600}.l{fill:#6e7781;font-size:13px}.v{fill:#24292f;font-size:13px;font-weight:600}</style>
 <text x="4" y="22" class="h">GitHub stats</text>
 <text x="290" y="22" class="h">Top languages</text>
-<text x="4" y="52" class="l">Contributions (last year)</text><text x="230" y="52" class="v" text-anchor="end">1,315</text>
-<text x="4" y="76" class="l">Commits (last year)</text><text x="230" y="76" class="v" text-anchor="end">1,131</text>
-<text x="4" y="100" class="l">Pull requests</text><text x="230" y="100" class="v" text-anchor="end">191</text>
-<text x="4" y="124" class="l">Issues</text><text x="230" y="124" class="v" text-anchor="end">3</text>
+<text x="4" y="52" class="l">Contributions (last year)</text><text x="230" y="52" class="v" text-anchor="end">1,310</text>
+<text x="4" y="76" class="l">Commits (last year)</text><text x="230" y="76" class="v" text-anchor="end">23</text>
+<text x="4" y="100" class="l">Pull requests</text><text x="230" y="100" class="v" text-anchor="end">3</text>
+<text x="4" y="124" class="l">Issues</text><text x="230" y="124" class="v" text-anchor="end">0</text>
 <text x="4" y="148" class="l">Public repos</text><text x="230" y="148" class="v" text-anchor="end">1</text>
 <text x="4" y="172" class="l">Stars earned</text><text x="230" y="172" class="v" text-anchor="end">0</text>
 <text x="4" y="196" class="l">Followers</text><text x="230" y="196" class="v" text-anchor="end">22</text>
