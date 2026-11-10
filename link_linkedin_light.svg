@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="287" height="60" viewBox="0 0 287 60" font-family="Consolas,Menlo,monospace">
+<rect x="1" y="1" width="285" height="58" rx="6" fill="#f6f8fa" stroke="#d0d7de" stroke-width="2"/>
+<rect x="3" y="54" width="281" height="3" fill="#c2410c"/>
+<text x="143.5" y="35" font-size="18" fill="#24292f" text-anchor="middle">LINKEDIN</text>
+</svg>

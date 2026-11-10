@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860px" height="415px"
+     font-family="ConsolasFallback,Consolas,Menlo,monospace">
+<style>
+@font-face {
+  src: local('Consolas'), local('Consolas Bold');
+  font-family: 'ConsolasFallback';
+  font-display: swap;
+  size-adjust: 109%;
+}
+.key {fill: #c2410c;}
+.value {fill: #0550ae;}
+.title {fill: #c2410c; font-weight: bold;}
+.cc {fill: #6e7781;}
+text, tspan {white-space: pre;}
+</style>
+<rect width="860px" height="415px" fill="#f6f8fa" rx="15" stroke="#d0d7de"/>
+<text fill="#c2410c" font-size="14px">
+<tspan x="30" y="150"> _       __  __ </tspan>
+<tspan x="30" y="168">| |     |  \/  |</tspan>
+<tspan x="30" y="186">| |     | |\/| |</tspan>
+<tspan x="30" y="204">| |___  | |  | |</tspan>
+<tspan x="30" y="222">|_____| |_|  |_|</tspan>
+</text>
+<text fill="#6e7781" font-size="12px">
+<tspan x="30" y="256">software developer</tspan>
+</text>
+<text fill="#24292f" font-size="16px">
+<tspan x="330" y="31"><tspan class="title">lendert@manani</tspan> -----------------------------------</tspan>
+<tspan x="330" y="51"><tspan class="cc">. </tspan><tspan class="key">Role</tspan>:<tspan class="cc"> ................. </tspan><tspan class="value">Software Developer</tspan></tspan>
+<tspan x="330" y="71"><tspan class="cc">. </tspan><tspan class="key">Host</tspan>:<tspan class="cc"> ................. </tspan><tspan class="value">Lilongwe, Malawi</tspan></tspan>
+<tspan x="330" y="91"><tspan class="cc">. </tspan><tspan class="key">Studio</tspan>:<tspan class="cc"> ............... </tspan><tspan class="value">ericlyndert</tspan></tspan>
+<tspan x="330" y="111" class="cc">.</tspan>
+<tspan x="330" y="131"><tspan class="cc">. </tspan><tspan class="key">Languages</tspan>:<tspan class="cc"> ............ </tspan><tspan class="value">TypeScript, JavaScript</tspan></tspan>
+<tspan x="330" y="151"><tspan class="cc">. </tspan><tspan class="key">Frameworks</tspan>:<tspan class="cc"> ........... </tspan><tspan class="value">React, Next.js</tspan></tspan>
+<tspan x="330" y="171"><tspan class="cc">. </tspan><tspan class="key">Styling</tspan>:<tspan class="cc"> .............. </tspan><tspan class="value">Tailwind CSS</tspan></tspan>
+<tspan x="330" y="191"><tspan class="cc">. </tspan><tspan class="key">Tools</tspan>:<tspan class="cc"> ................ </tspan><tspan class="value">Git, Figma</tspan></tspan>
+<tspan x="330" y="211"><tspan class="cc">. </tspan><tspan class="key">Focus</tspan>:<tspan class="cc"> ................ </tspan><tspan class="value">Web apps, Design systems</tspan></tspan>
+<tspan x="330" y="231" class="cc">.</tspan>
+<tspan x="330" y="251">- Contact -------------------------------------</tspan>
+<tspan x="330" y="271"><tspan class="cc">. </tspan><tspan class="key">Website</tspan>:<tspan class="cc"> .............. </tspan><tspan class="value">ericlyndert.com</tspan></tspan>
+<tspan x="330" y="291"><tspan class="cc">. </tspan><tspan class="key">LinkedIn</tspan>:<tspan class="cc"> ............. </tspan><tspan class="value">ericlyndert</tspan></tspan>
+<tspan x="330" y="311"><tspan class="cc">. </tspan><tspan class="key">Behance</tspan>:<tspan class="cc"> .............. </tspan><tspan class="value">ericlyndert</tspan></tspan>
+<tspan x="330" y="331"><tspan class="cc">. </tspan><tspan class="key">X</tspan>:<tspan class="cc"> .................... </tspan><tspan class="value">@ericlyndert</tspan></tspan>
+<tspan x="330" y="351"><tspan class="cc">. </tspan><tspan class="key">Instagram</tspan>:<tspan class="cc"> ............ </tspan><tspan class="value">@ericlyndert</tspan></tspan>
+<tspan x="330" y="371" class="cc">.</tspan>
+<tspan x="330" y="395"><tspan class="key">&gt; </tspan><tspan class="value">█<animate attributeName="opacity" values="1;0" dur="1.06s" calcMode="discrete" repeatCount="indefinite"/></tspan></tspan>
+</text>
+</svg>
