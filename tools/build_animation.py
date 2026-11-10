@@ -90,64 +90,82 @@ def eating_order(weeks):
 
 
 DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))
+MAX_STEPS = 4000
 
 
 def plan_path(order, seed):
-    """Pac-Man wanders to the nearest uneaten days; ghosts hunt him with different personalities."""
+    """Pac-Man eats green days while dodging; AI ghosts can only walk on empty or eaten days."""
     rng = random.Random(seed)
     valid = {(w, r) for (w, r, *_rest) in order}
     targets = {(w, r) for (w, r, c, _l, _d) in order if c > 0}
-    cells = sorted(valid)
-    cur = rng.choice([c for c in cells if c[0] < 6])
-    path, eaten = [cur], {}
-    if cur in targets:
-        eaten[cur] = 0
-        targets.discard(cur)
-    while targets:
-        parent, dist, queue = {cur: None}, {cur: 0}, deque([cur])
+    empties = sorted(valid - targets)
+    last_col = max(c[0] for c in valid)
+
+    def neighbors(cell):
+        return [(cell[0] + dx, cell[1] + dy) for dx, dy in DIRS if (cell[0] + dx, cell[1] + dy) in valid]
+
+    def man(a, b):
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+    pac = rng.choice([c for c in empties if c[0] < 8])
+    ghosts = []
+    for lo, hi in ((0.85, 1.0), (0.6, 0.85), (0.35, 0.6)):
+        pool = [c for c in empties if lo * last_col <= c[0] <= hi * last_col and man(c, pac) > 10]
+        ghosts.append(rng.choice(pool or empties))
+    traits = [(0.9, 0.85), (0.8, 0.75), (0.5, 0.65)]  # chase odds, speed
+
+    path, eaten = [pac], {}
+    trails = [[g] for g in ghosts]
+    steps, last_eat = 0, 0
+    while targets and steps < MAX_STEPS:
+        steps += 1
+        danger = {g for gh in ghosts for g in ([gh] if len(path) - last_eat > 25 else [gh, *neighbors(gh)])}
+        parent, dist, queue = {pac: None}, {pac: 0}, deque([pac])
         while queue:
             node = queue.popleft()
-            nbrs = [(node[0] + dx, node[1] + dy) for dx, dy in DIRS]
+            nbrs = neighbors(node)
             rng.shuffle(nbrs)
             for nb in nbrs:
-                if nb in valid and nb not in parent:
+                if nb not in parent and nb not in danger:
                     parent[nb], dist[nb] = node, dist[node] + 1
                     queue.append(nb)
-        best = min(dist[c] for c in targets)
-        pool = [c for c in targets if dist[c] == best]
-        if rng.random() < 0.35:
-            pool = [c for c in targets if dist[c] <= best + 8] or pool
-        goal = rng.choice(sorted(pool))
-        leg = []
-        while goal != cur:
-            leg.append(goal)
-            goal = parent[goal]
-        for step in reversed(leg):
-            path.append(step)
-            if step in targets:
-                eaten[step] = len(path) - 1
-                targets.discard(step)
-        cur = path[-1]
+        reachable = [c for c in targets if c in dist]
+        if reachable:
+            def cost(c):
+                return dist[c] - 0.6 * min(min(man(c, g) for g in ghosts), 12)
+            goal = min(reachable, key=lambda c: (cost(c), rng.random()))
+            while parent[goal] != pac and parent[goal] is not None:
+                goal = parent[goal]
+            nxt = goal
+        else:
+            safe = [c for c in neighbors(pac) if c not in ghosts]
+            nxt = max(safe, key=lambda c: (min(man(c, g) for g in ghosts), rng.random())) if safe else pac
+        pac = nxt
+        path.append(pac)
+        if pac in targets:
+            eaten[pac] = len(path) - 1
+            last_eat = len(path)
+            targets.discard(pac)
 
-    n = len(path)
-    starts = [max(cells), (max(c[0] for c in cells) // 2, 6), (max(c[0] for c in cells) // 2, 0)]
-    traits = [(0.75, 0, 0.9), (0.85, 4, 0.8), (0.3, 0, 0.7)]  # chase odds, lookahead, speed
-    ghosts = []
-    for k in range(3):
-        chase, ahead, speed = traits[k]
-        pos, prev, trail = starts[k], None, [starts[k]]
-        for i in range(1, n):
+        walk = (valid - targets) | {pac}
+        pdist, queue = {pac: 0}, deque([pac])
+        while queue:
+            node = queue.popleft()
+            for nb in neighbors(node):
+                if nb in walk and nb not in pdist:
+                    pdist[nb] = pdist[node] + 1
+                    queue.append(nb)
+        for k, g in enumerate(ghosts):
+            chase, speed = traits[k]
             if rng.random() < speed:
-                target = path[min(i + ahead, n - 1)]
-                opts = [(pos[0] + dx, pos[1] + dy) for dx, dy in DIRS if (pos[0] + dx, pos[1] + dy) in valid]
-                fwd = [o for o in opts if o != prev] or opts
-                if rng.random() < chase:
-                    low = min(abs(o[0] - target[0]) + abs(o[1] - target[1]) for o in fwd)
-                    fwd = [o for o in fwd if abs(o[0] - target[0]) + abs(o[1] - target[1]) == low]
-                prev, pos = pos, rng.choice(fwd)
-            trail.append(pos)
-        ghosts.append(trail)
-    return path, eaten, ghosts
+                opts = [c for c in neighbors(g) if c in walk and c != pac]
+                if opts:
+                    if rng.random() < chase and any(c in pdist for c in opts):
+                        low = min(pdist.get(c, 10**6) for c in opts)
+                        opts = [c for c in opts if pdist.get(c, 10**6) == low]
+                    ghosts[k] = rng.choice(opts)
+            trails[k].append(ghosts[k])
+    return path, eaten, trails
 
 def kt(value):
     return f"{min(max(value, 0.0), 1.0):.4f}"

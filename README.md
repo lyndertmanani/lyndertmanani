@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/lyndertmanani/lyndertmanani/main/contrib_dark.svg?v=5">
-  <img alt="Pac-Man eating my contribution graph" src="https://raw.githubusercontent.com/lyndertmanani/lyndertmanani/main/contrib_light.svg?v=5">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/lyndertmanani/lyndertmanani/main/contrib_dark.svg?v=6">
+  <img alt="Pac-Man eating my contribution graph" src="https://raw.githubusercontent.com/lyndertmanani/lyndertmanani/main/contrib_light.svg?v=6">
 </picture>
 
 <a href="https://www.ericlyndert.com">
