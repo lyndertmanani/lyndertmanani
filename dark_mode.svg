@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg xmlns="http://www.w3.org/2000/svg" width="788" height="332" viewBox="0 0 788 332" font-family="ConsolasFallback,Consolas,Menlo,monospace">
+<svg xmlns="http://www.w3.org/2000/svg" width="788" height="266" viewBox="0 0 788 266" font-family="ConsolasFallback,Consolas,Menlo,monospace">
 <style>
 text{white-space:pre}
 .p{fill:#c9d1d9;font-size:14px}
@@ -9,16 +9,13 @@ text{white-space:pre}
 .t{fill:#c9d1d9;font-size:12px}
 </style>
 <text x="4" y="24" class="p"><tspan fill="#3fb950">lendert@manani</tspan>:<tspan fill="#a371f7">~</tspan>$ neofetch</text>
-<text x="4" y="48" class="k">Role</text><text x="124" y="48" class="d">:</text><text x="138" y="48" class="v">Software Developer @ NICO Technologies</text>
-<text x="4" y="70" class="k">Location</text><text x="124" y="70" class="d">:</text><text x="138" y="70" class="v">Lilongwe, Malawi</text>
+<text x="4" y="48" class="k">Role</text><text x="124" y="48" class="d">:</text><text x="138" y="48" class="v">Software Developer</text>
+<text x="4" y="70" class="k">Location</text><text x="124" y="70" class="d">:</text><text x="138" y="70" class="v">Blantyre, Malawi</text>
 <text x="4" y="92" class="k">Focus</text><text x="124" y="92" class="d">:</text><text x="138" y="92" class="v">Digital Transformation</text>
-<text x="4" y="114" class="k">Building</text><text x="124" y="114" class="d">:</text><text x="138" y="114" class="v">One-NICO Unified Website, Pashoyo (lead)</text>
-<text x="4" y="136" class="k">Stack</text><text x="124" y="136" class="d">:</text><text x="138" y="136" class="v">C# (.NET), Umbraco, TypeScript, Next.js, Tailwind</text>
-<text x="4" y="158" class="k">Practice</text><text x="124" y="158" class="d">:</text><text x="138" y="158" class="v">REST APIs, WCAG 2.2 AA, Agile delivery</text>
-<text x="4" y="180" class="k">Education</text><text x="124" y="180" class="d">:</text><text x="138" y="180" class="v">BSc (Hons) Computing, University of Greenwich</text>
-<text x="4" y="202" class="k">Studio</text><text x="124" y="202" class="d">:</text><text x="138" y="202" class="v">ericlyndert</text>
-<text x="4" y="238" class="p"><tspan fill="#3fb950">lendert@manani</tspan>:<tspan fill="#a371f7">~</tspan>$ contact --list</text>
-<text x="4" y="262" class="k">Website</text><text x="124" y="262" class="d">:</text><text x="138" y="262" class="v">ericlyndert.com</text>
-<text x="4" y="284" class="k">LinkedIn</text><text x="124" y="284" class="d">:</text><text x="138" y="284" class="v">linkedin.com/in/ericlyndert</text>
-<text x="4" y="320" class="p"><tspan fill="#3fb950">lendert@manani</tspan>:<tspan fill="#a371f7">~</tspan>$ <tspan fill="#a371f7">█<animate attributeName="opacity" values="1;0" dur="1.06s" calcMode="discrete" repeatCount="indefinite"/></tspan></text>
+<text x="4" y="114" class="k">Stack</text><text x="124" y="114" class="d">:</text><text x="138" y="114" class="v">C# (.NET), Umbraco, TypeScript, Next.js, Tailwind</text>
+<text x="4" y="136" class="k">Practice</text><text x="124" y="136" class="d">:</text><text x="138" y="136" class="v">REST APIs, WCAG 2.2 AA, Agile delivery</text>
+<text x="4" y="172" class="p"><tspan fill="#3fb950">lendert@manani</tspan>:<tspan fill="#a371f7">~</tspan>$ contact --list</text>
+<text x="4" y="196" class="k">Website</text><text x="124" y="196" class="d">:</text><text x="138" y="196" class="v">ericlyndert.com</text>
+<text x="4" y="218" class="k">LinkedIn</text><text x="124" y="218" class="d">:</text><text x="138" y="218" class="v">linkedin.com/in/ericlyndert</text>
+<text x="4" y="254" class="p"><tspan fill="#3fb950">lendert@manani</tspan>:<tspan fill="#a371f7">~</tspan>$ <tspan fill="#a371f7">█<animate attributeName="opacity" values="1;0" dur="1.06s" calcMode="discrete" repeatCount="indefinite"/></tspan></text>
 </svg>
