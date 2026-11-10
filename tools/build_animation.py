@@ -7,6 +7,8 @@ contrib_dark.svg / contrib_light.svg. As the icon eats each square the
 Needs GITHUB_TOKEN in the environment. LOGIN defaults to the repo owner.
 """
 import json
+import random
+from collections import deque
 import os
 import urllib.request
 from datetime import date
@@ -51,7 +53,7 @@ THEMES = {
 CELL, GAP = 11, 3
 PITCH = CELL + GAP
 LEFT, TOP = 36, 28
-STEP_SECONDS = 0.05
+STEP_SECONDS = 0.14
 PAUSE_SECONDS = 3.0
 RESET = 0.985
 
@@ -82,6 +84,45 @@ def eating_order(weeks):
     return order
 
 
+def plan_path(order, seed):
+    """Wander the grid toward uneaten cells; returns the walk and the step each cell is first eaten."""
+    rng = random.Random(seed)
+    valid = {(w, r) for (w, r, *_rest) in order}
+    targets = {(w, r) for (w, r, c, _l, _d) in order if c > 0}
+    cur = min(valid)
+    path, eaten = [cur], {}
+    if cur in targets:
+        eaten[cur] = 0
+        targets.discard(cur)
+    heading = (1, 0)
+    while targets:
+        parent, dist, queue = {cur: None}, {cur: 0}, deque([cur])
+        while queue:
+            node = queue.popleft()
+            nbrs = [(node[0] + dx, node[1] + dy) for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))]
+            rng.shuffle(nbrs)
+            for nb in nbrs:
+                if nb in valid and nb not in parent:
+                    parent[nb], dist[nb] = node, dist[node] + 1
+                    queue.append(nb)
+        best = min(dist[c] for c in targets)
+        pool = [c for c in targets if dist[c] == best]
+        if rng.random() < 0.3:
+            pool = [c for c in targets if dist[c] <= best + 6] or pool
+        goal = rng.choice(sorted(pool))
+        leg = []
+        while goal != cur:
+            leg.append(goal)
+            goal = parent[goal]
+        for step in reversed(leg):
+            path.append(step)
+            if step in targets:
+                eaten[step] = len(path) - 1
+                targets.discard(step)
+        cur = path[-1]
+    return path, eaten
+
+
 def kt(value):
     return f"{min(max(value, 0.0), 1.0):.4f}"
 
@@ -91,7 +132,8 @@ def render(calendar, theme_name):
     weeks = calendar["weeks"]
     total = calendar["totalContributions"]
     order = eating_order(weeks)
-    n = len(order)
+    path, eaten = plan_path(order, date.today().toordinal())
+    n = len(path)
     move = n * STEP_SECONDS
     dur = move + PAUSE_SECONDS
     frac = move / dur
@@ -129,12 +171,12 @@ def render(calendar, theme_name):
         out.append(
             f'<rect x="{x}" y="{y}" width="{CELL}" height="{CELL}" rx="2" fill="{base}"><title>{title}</title>'
             f'<animate attributeName="fill" calcMode="discrete" dur="{dur:.2f}s" repeatCount="indefinite" '
-            f'values="{base};{empty};{base}" keyTimes="0;{kt(at(i))};{RESET}"/></rect>'
+            f'values="{base};{empty};{base}" keyTimes="0;{kt(at(eaten[(w, row)]))};{RESET}"/></rect>'
         )
 
     pos = [
         (LEFT + w * PITCH + CELL / 2, TOP + row * PITCH + CELL / 2)
-        for (w, row, _c, _l, _d) in order
+        for (w, row) in path
     ]
     keytimes = ";".join(kt(i / (n - 1) * frac) for i in range(n)) + ";1"
 
@@ -150,7 +192,7 @@ def render(calendar, theme_name):
 
     for k, color in reversed(list(enumerate(t["ghosts"]))):
         out.append(
-            f'<g>{move(track(6 * (k + 1), -8, -8))}'
+            f'<g>{move(track((5, 9, 14)[k], -8, -8))}'
             f'<path d="{COPILOT_PATH}" fill="{color}" transform="scale(0.6667)"/></g>'
         )
 
