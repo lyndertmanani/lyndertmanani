@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["tools/build_animation.py", ".github/workflows/contrib-animation.yml"]
+    paths: ["tools/build_animation.py", "tools/build_stats.py", ".github/workflows/contrib-animation.yml"]
 
 permissions:
   contents: write
@@ -28,11 +28,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LOGIN: ${{ github.repository_owner }}
 
+      - name: Build stats
+        run: python tools/build_stats.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LOGIN: ${{ github.repository_owner }}
+
       - name: Commit changes
         run: |
           git config user.name "${{ github.repository_owner }}"
           git config user.email "${{ github.repository_owner }}@users.noreply.github.com"
-          git add contrib_dark.svg contrib_light.svg
+          git add contrib_dark.svg contrib_light.svg stats_dark.svg stats_light.svg
           git diff --cached --quiet || git commit -m "Update contribution animation"
           git pull --rebase origin main
           git push
