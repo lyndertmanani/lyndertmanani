@@ -1,4 +1,4 @@
-"""Render the contribution calendar with a GitHub Copilot icon eating it.
+"""Render the contribution calendar with a GitHub Pac-Man eating it, chased by Copilot icons.
 
 Fetches the last year of contributions through the GraphQL API and writes
 contrib_dark.svg / contrib_light.svg. As the icon eats each square the
@@ -37,12 +37,12 @@ LEVELS = ["NONE", "FIRST_QUARTILE", "SECOND_QUARTILE", "THIRD_QUARTILE", "FOURTH
 
 THEMES = {
     "dark": {
-        "bg": "#0d1117", "border": "#30363d", "bar": "#161b22", "text": "#c9d1d9",
+        "text": "#c9d1d9", "pac": "#e3b341", "ghosts": ["#a371f7", "#58a6ff", "#f778ba"],
         "muted": "#8b949e", "accent": "#a371f7",
         "cells": ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
     },
     "light": {
-        "bg": "#ffffff", "border": "#d0d7de", "bar": "#f6f8fa", "text": "#24292f",
+        "text": "#24292f", "pac": "#bf8700", "ghosts": ["#8250df", "#0969da", "#bf3989"],
         "muted": "#6e7781", "accent": "#8250df",
         "cells": ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
     },
@@ -50,7 +50,7 @@ THEMES = {
 
 CELL, GAP = 11, 3
 PITCH = CELL + GAP
-LEFT, TOP = 36, 66
+LEFT, TOP = 36, 28
 STEP_SECONDS = 0.05
 PAUSE_SECONDS = 3.0
 RESET = 0.985
@@ -104,13 +104,9 @@ def render(calendar, theme_name):
 
     out = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
-        'font-family="ConsolasFallback,Consolas,Menlo,monospace">',
+        'font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif">',
         "<style>text{white-space:pre}.m{fill:%s;font-size:10px}.p{fill:%s;font-size:12px}.n{fill:%s;font-size:14px;font-weight:bold}</style>"
         % (t["muted"], t["text"], t["accent"]),
-        f'<rect x="1" y="1" width="{width - 2}" height="{height - 2}" rx="10" fill="{t["bg"]}" stroke="{t["border"]}" stroke-width="2"/>',
-        f'<path d="M1 11a10 10 0 0 1 10-10h{width - 22}a10 10 0 0 1 10 10v22H1z" fill="{t["bar"]}"/>',
-        '<circle cx="20" cy="17" r="5" fill="#ff5f56"/><circle cx="38" cy="17" r="5" fill="#ffbd2e"/><circle cx="56" cy="17" r="5" fill="#27c93f"/>',
-        f'<text x="78" y="21" class="p">lendert@manani:~$ <tspan fill="{t["accent"]}">./eat-contributions.sh</tspan></text>',
     ]
 
     last_month, last_x = None, -100
@@ -137,17 +133,44 @@ def render(calendar, theme_name):
         )
 
     pos = [
-        (LEFT + w * PITCH + CELL / 2 - 8, TOP + row * PITCH + CELL / 2 - 8)
+        (LEFT + w * PITCH + CELL / 2, TOP + row * PITCH + CELL / 2)
         for (w, row, _c, _l, _d) in order
     ]
-    values = ";".join(f"{x:.1f} {y:.1f}" for x, y in pos) + f";{pos[-1][0]:.1f} {pos[-1][1]:.1f}"
     keytimes = ";".join(kt(i / (n - 1) * frac) for i in range(n)) + ";1"
-    out.append(
-        f'<g><animateTransform attributeName="transform" type="translate" calcMode="linear" '
-        f'dur="{dur:.2f}s" repeatCount="indefinite" values="{values}" keyTimes="{keytimes}"/>'
-        f'<path d="{COPILOT_PATH}" fill="{t["accent"]}" transform="scale(0.6667)"/></g>'
-    )
 
+    def track(lag, dx, dy):
+        pts = [pos[max(i - lag, 0)] for i in range(n)] + [pos[-1]]
+        return ";".join(f"{x + dx:.1f} {y + dy:.1f}" for x, y in pts)
+
+    def move(values):
+        return (
+            f'<animateTransform attributeName="transform" type="translate" calcMode="linear" '
+            f'dur="{dur:.2f}s" repeatCount="indefinite" values="{values}" keyTimes="{keytimes}"/>'
+        )
+
+    for k, color in reversed(list(enumerate(t["ghosts"]))):
+        out.append(
+            f'<g>{move(track(6 * (k + 1), -8, -8))}'
+            f'<path d="{COPILOT_PATH}" fill="{color}" transform="scale(0.6667)"/></g>'
+        )
+
+    angles = []
+    for i in range(n):
+        j = min(i + 1, n - 1)
+        ddx, ddy = pos[j][0] - pos[i][0], pos[j][1] - pos[i][1]
+        angles.append(0 if ddx > 0 else (90 if ddy > 0 else 270 if ddy < 0 else (angles[-1] if angles else 0)))
+    angles.append(angles[-1])
+    rot = ";".join(f"{a} 0 0" for a in angles)
+    r = 7
+    open_d = f"M0 0L{r * 0.766:.2f} {-r * 0.643:.2f}A{r} {r} 0 1 0 {r * 0.766:.2f} {r * 0.643:.2f}Z"
+    shut_d = f"M0 0L{r:.2f} {-0.3}A{r} {r} 0 1 0 {r:.2f} {0.3}Z"
+    out.append(
+        f'<g>{move(track(0, 0, 0))}'
+        f'<g><animateTransform attributeName="transform" type="rotate" calcMode="discrete" '
+        f'dur="{dur:.2f}s" repeatCount="indefinite" values="{rot}" keyTimes="{keytimes}"/>'
+        f'<path d="{open_d}" fill="{t["pac"]}">'
+        f'<animate attributeName="d" dur="0.3s" repeatCount="indefinite" values="{open_d};{shut_d};{open_d}"/></path></g></g>'
+    )
     fy = TOP + 7 * PITCH + 30
     out.append(f'<text x="{LEFT}" y="{fy}" class="p">remaining contributions:</text>')
     remaining = total
