@@ -53,7 +53,7 @@ THEMES = {
 CELL, GAP = 11, 3
 PITCH = CELL + GAP
 LEFT, TOP = 36, 28
-STEP_SECONDS = 0.1
+STEP_SECONDS = 0.12
 PAD = 15
 TAIL = 16
 LAGS = (5, 8, 11)
@@ -89,15 +89,65 @@ def eating_order(weeks):
     return order
 
 
-def plan_path(order, weeks):
-    """Classic Pac-Man sweep: row by row, left to right then back, stepping down at each edge."""
+DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))
+
+
+def plan_path(order, seed):
+    """Pac-Man wanders to the nearest uneaten days; ghosts hunt him with different personalities."""
+    rng = random.Random(seed)
     valid = {(w, r) for (w, r, *_rest) in order}
-    path = []
-    for row in range(7):
-        cols = range(weeks) if row % 2 == 0 else range(weeks - 1, -1, -1)
-        path += [(c, row) for c in cols]
-    eaten = {cell: PAD + k for k, cell in enumerate(path) if cell in valid}
-    return path, eaten
+    targets = {(w, r) for (w, r, c, _l, _d) in order if c > 0}
+    cells = sorted(valid)
+    cur = rng.choice([c for c in cells if c[0] < 6])
+    path, eaten = [cur], {}
+    if cur in targets:
+        eaten[cur] = 0
+        targets.discard(cur)
+    while targets:
+        parent, dist, queue = {cur: None}, {cur: 0}, deque([cur])
+        while queue:
+            node = queue.popleft()
+            nbrs = [(node[0] + dx, node[1] + dy) for dx, dy in DIRS]
+            rng.shuffle(nbrs)
+            for nb in nbrs:
+                if nb in valid and nb not in parent:
+                    parent[nb], dist[nb] = node, dist[node] + 1
+                    queue.append(nb)
+        best = min(dist[c] for c in targets)
+        pool = [c for c in targets if dist[c] == best]
+        if rng.random() < 0.35:
+            pool = [c for c in targets if dist[c] <= best + 8] or pool
+        goal = rng.choice(sorted(pool))
+        leg = []
+        while goal != cur:
+            leg.append(goal)
+            goal = parent[goal]
+        for step in reversed(leg):
+            path.append(step)
+            if step in targets:
+                eaten[step] = len(path) - 1
+                targets.discard(step)
+        cur = path[-1]
+
+    n = len(path)
+    starts = [max(cells), (max(c[0] for c in cells) // 2, 6), (max(c[0] for c in cells) // 2, 0)]
+    traits = [(0.75, 0, 0.9), (0.85, 4, 0.8), (0.3, 0, 0.7)]  # chase odds, lookahead, speed
+    ghosts = []
+    for k in range(3):
+        chase, ahead, speed = traits[k]
+        pos, prev, trail = starts[k], None, [starts[k]]
+        for i in range(1, n):
+            if rng.random() < speed:
+                target = path[min(i + ahead, n - 1)]
+                opts = [(pos[0] + dx, pos[1] + dy) for dx, dy in DIRS if (pos[0] + dx, pos[1] + dy) in valid]
+                fwd = [o for o in opts if o != prev] or opts
+                if rng.random() < chase:
+                    low = min(abs(o[0] - target[0]) + abs(o[1] - target[1]) for o in fwd)
+                    fwd = [o for o in fwd if abs(o[0] - target[0]) + abs(o[1] - target[1]) == low]
+                prev, pos = pos, rng.choice(fwd)
+            trail.append(pos)
+        ghosts.append(trail)
+    return path, eaten, ghosts
 
 def kt(value):
     return f"{min(max(value, 0.0), 1.0):.4f}"
@@ -108,7 +158,7 @@ def render(calendar, theme_name):
     weeks = calendar["weeks"]
     total = calendar["totalContributions"]
     order = eating_order(weeks)
-    path, eaten = plan_path(order, len(weeks))
+    path, eaten, ghost_paths = plan_path(order, date.today().toordinal())
     n = len(path)
     move = n * STEP_SECONDS
     dur = move + PAUSE_SECONDS
@@ -150,21 +200,13 @@ def render(calendar, theme_name):
             f'values="{base};{empty};{base}" keyTimes="0;{kt(at(eaten[(w, row)]))};{RESET}"/></rect>'
         )
 
-    def cell_at(idx):
-        if idx < 0:
-            return path[0][0] + idx, path[0][1]
-        if idx >= len(path):
-            return path[-1][0] + idx - len(path) + 1, path[-1][1]
-        return path[idx]
-
-    def xy(idx):
-        c, r = cell_at(idx)
-        return LEFT + c * PITCH + CELL / 2, TOP + r * PITCH + CELL / 2
+    def xy(cell):
+        return LEFT + cell[0] * PITCH + CELL / 2, TOP + cell[1] * PITCH + CELL / 2
 
     keytimes = ";".join(kt(i / (n - 1) * frac) for i in range(n)) + ";1"
 
-    def track(lag, dx, dy):
-        pts = [xy(max(i - PAD, 0) - lag) for i in range(n)]
+    def track(cells, dx, dy):
+        pts = [xy(c) for c in cells]
         pts.append(pts[-1])
         return ";".join(f"{x + dx:.1f} {y + dy:.1f}" for x, y in pts)
 
@@ -178,22 +220,22 @@ def render(calendar, theme_name):
     for k, (d_attr, color) in reversed(list(enumerate(chasers))):
         stride = (0.34, 0.30, 0.38)[k]
         out.append(
-            f'<g>{move(track(LAGS[k], 0, 0))}<g>'
+            f'<g>{move(track(ghost_paths[k], 0, 0))}<g>'
             f'<animateTransform attributeName="transform" type="translate" dur="{stride}s" repeatCount="indefinite" '
             f'values="-8 -8;-8 -10.5;-8 -8"/>'
             f'<path d="{d_attr}" fill="{color}" transform="scale(0.6667)"/></g></g>'
         )
-    angles = []
-    for i in range(n):
-        (x1, y1), (x2, y2) = xy(max(i - PAD, 0)), xy(max(i - PAD, 0) + 1)
-        angles.append(0 if x2 > x1 else 180 if x2 < x1 else 90)
+    angles = [0]
+    for i in range(n - 1):
+        dx, dy = path[i + 1][0] - path[i][0], path[i + 1][1] - path[i][1]
+        angles.append({(1, 0): 0, (-1, 0): 180, (0, 1): 90, (0, -1): 270}.get((dx, dy), angles[-1]))
     angles.append(angles[-1])
     rot = ";".join(f"{a} 0 0" for a in angles)
     r = 7
     open_d = f"M0 0L{r * 0.766:.2f} {-r * 0.643:.2f}A{r} {r} 0 1 0 {r * 0.766:.2f} {r * 0.643:.2f}Z"
     shut_d = f"M0 0L{r:.2f} {-0.3}A{r} {r} 0 1 0 {r:.2f} {0.3}Z"
     out.append(
-        f'<g>{move(track(0, 0, 0))}'
+        f'<g>{move(track(path, 0, 0))}'
         f'<g><animateTransform attributeName="transform" type="rotate" calcMode="discrete" '
         f'dur="{dur:.2f}s" repeatCount="indefinite" values="{rot}" keyTimes="{keytimes}"/>'
         f'<path d="{open_d}" fill="{t["pac"]}">'
