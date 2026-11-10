@@ -1,35 +1,28 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg xmlns="http://www.w3.org/2000/svg" width="560px" height="335px"
-     font-family="ConsolasFallback,Consolas,Menlo,monospace">
+<svg xmlns="http://www.w3.org/2000/svg" width="788" height="380" viewBox="0 0 788 380" font-family="ConsolasFallback,Consolas,Menlo,monospace">
 <style>
-@font-face {
-  src: local('Consolas'), local('Consolas Bold');
-  font-family: 'ConsolasFallback';
-  font-display: swap;
-  size-adjust: 109%;
-}
-.key {fill: #F76E0A;}
-.value {fill: #a5d6ff;}
-.title {fill: #F76E0A; font-weight: bold;}
-.cc {fill: #616e7f;}
-text, tspan {white-space: pre;}
+text{white-space:pre}
+.p{fill:#c9d1d9;font-size:14px}
+.k{fill:#a371f7;font-size:14px;font-weight:bold}
+.d{fill:#8b949e;font-size:14px}
+.v{fill:#a5d6ff;font-size:14px}
+.t{fill:#c9d1d9;font-size:12px}
 </style>
-<rect width="560px" height="335px" fill="#161b22" rx="15"/>
-<text fill="#c9d1d9" font-size="16px">
-<tspan x="30" y="35"><tspan class="title">lendert@manani</tspan> ------------------------------</tspan>
-<tspan x="30" y="55"><tspan class="cc">. </tspan><tspan class="key">Role</tspan>:<tspan class="cc"> ................. </tspan><tspan class="value">Software Developer</tspan></tspan>
-<tspan x="30" y="75"><tspan class="cc">. </tspan><tspan class="key">Host</tspan>:<tspan class="cc"> ................. </tspan><tspan class="value">Lilongwe, Malawi</tspan></tspan>
-<tspan x="30" y="95"><tspan class="cc">. </tspan><tspan class="key">Studio</tspan>:<tspan class="cc"> ............... </tspan><tspan class="value">ericlyndert</tspan></tspan>
-<tspan x="30" y="115" class="cc">.</tspan>
-<tspan x="30" y="135"><tspan class="cc">. </tspan><tspan class="key">Focus</tspan>:<tspan class="cc"> ................ </tspan><tspan class="value">Digital Transformation</tspan></tspan>
-<tspan x="30" y="155"><tspan class="cc">. </tspan><tspan class="key">Languages</tspan>:<tspan class="cc"> ............ </tspan><tspan class="value">TypeScript, JavaScript</tspan></tspan>
-<tspan x="30" y="175"><tspan class="cc">. </tspan><tspan class="key">Frameworks</tspan>:<tspan class="cc"> ........... </tspan><tspan class="value">React, Next.js</tspan></tspan>
-<tspan x="30" y="195"><tspan class="cc">. </tspan><tspan class="key">Styling</tspan>:<tspan class="cc"> .............. </tspan><tspan class="value">Tailwind CSS</tspan></tspan>
-<tspan x="30" y="215"><tspan class="cc">. </tspan><tspan class="key">Tools</tspan>:<tspan class="cc"> ................ </tspan><tspan class="value">Git, Figma</tspan></tspan>
-<tspan x="30" y="235" class="cc">.</tspan>
-<tspan x="30" y="255">- Contact ---------------------------------</tspan>
-<tspan x="30" y="275"><tspan class="cc">. </tspan><tspan class="key">Website</tspan>:<tspan class="cc"> .............. </tspan><tspan class="value">ericlyndert.com</tspan></tspan>
-<tspan x="30" y="295"><tspan class="cc">. </tspan><tspan class="key">LinkedIn</tspan>:<tspan class="cc"> ............. </tspan><tspan class="value">ericlyndert</tspan></tspan>
-<tspan x="30" y="319"><tspan class="key">&gt; </tspan><tspan class="value">█<animate attributeName="opacity" values="1;0" dur="1.06s" calcMode="discrete" repeatCount="indefinite"/></tspan></tspan>
-</text>
+<rect x="1" y="1" width="786" height="378" rx="10" fill="#0d1117" stroke="#30363d" stroke-width="2"/>
+<path d="M1 11a10 10 0 0 1 10-10h766a10 10 0 0 1 10 10v22H1z" fill="#161b22"/>
+<circle cx="20" cy="17" r="5" fill="#ff5f56"/><circle cx="38" cy="17" r="5" fill="#ffbd2e"/><circle cx="56" cy="17" r="5" fill="#27c93f"/>
+<text x="78" y="21" class="t">lendert@manani: ~</text>
+<text x="30" y="62" class="p"><tspan fill="#3fb950">lendert@manani</tspan>:<tspan fill="#a371f7">~</tspan>$ neofetch</text>
+<text x="30" y="86" class="k">Role</text><text x="150" y="86" class="d">:</text><text x="164" y="86" class="v">Software Developer @ NICO Technologies</text>
+<text x="30" y="108" class="k">Location</text><text x="150" y="108" class="d">:</text><text x="164" y="108" class="v">Lilongwe, Malawi</text>
+<text x="30" y="130" class="k">Focus</text><text x="150" y="130" class="d">:</text><text x="164" y="130" class="v">Digital Transformation</text>
+<text x="30" y="152" class="k">Building</text><text x="150" y="152" class="d">:</text><text x="164" y="152" class="v">One-NICO Unified Website, Pashoyo (lead)</text>
+<text x="30" y="174" class="k">Stack</text><text x="150" y="174" class="d">:</text><text x="164" y="174" class="v">C# (.NET), Umbraco, TypeScript, Next.js, Tailwind</text>
+<text x="30" y="196" class="k">Practice</text><text x="150" y="196" class="d">:</text><text x="164" y="196" class="v">REST APIs, WCAG 2.2 AA, Agile delivery</text>
+<text x="30" y="218" class="k">Education</text><text x="150" y="218" class="d">:</text><text x="164" y="218" class="v">BSc (Hons) Computing, University of Greenwich</text>
+<text x="30" y="240" class="k">Studio</text><text x="150" y="240" class="d">:</text><text x="164" y="240" class="v">ericlyndert</text>
+<text x="30" y="276" class="p"><tspan fill="#3fb950">lendert@manani</tspan>:<tspan fill="#a371f7">~</tspan>$ contact --list</text>
+<text x="30" y="300" class="k">Website</text><text x="150" y="300" class="d">:</text><text x="164" y="300" class="v">ericlyndert.com</text>
+<text x="30" y="322" class="k">LinkedIn</text><text x="150" y="322" class="d">:</text><text x="164" y="322" class="v">linkedin.com/in/ericlyndert</text>
+<text x="30" y="358" class="p"><tspan fill="#3fb950">lendert@manani</tspan>:<tspan fill="#a371f7">~</tspan>$ <tspan fill="#a371f7">█<animate attributeName="opacity" values="1;0" dur="1.06s" calcMode="discrete" repeatCount="indefinite"/></tspan></text>
 </svg>
