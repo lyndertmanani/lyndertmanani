@@ -2,9 +2,9 @@
 <style>.h{fill:#8250df;font-size:16px;font-weight:600}.l{fill:#6e7781;font-size:13px}.v{fill:#24292f;font-size:13px;font-weight:600}</style>
 <text x="4" y="22" class="h">GitHub stats</text>
 <text x="4" y="52" class="l">Repos contributed to</text><text x="356" y="52" class="v" text-anchor="end">2</text>
-<text x="4" y="78" class="l">Contributions (last year)</text><text x="356" y="78" class="v" text-anchor="end">1,474</text>
-<text x="4" y="104" class="l">Commits (last year)</text><text x="356" y="104" class="v" text-anchor="end">34</text>
-<text x="4" y="130" class="l">Lines of code changed</text><text x="356" y="130" class="v" text-anchor="end">25.4k</text>
-<text x="4" y="156" class="l">Lines added</text><text x="356" y="156" class="v" text-anchor="end">+14.4k</text>
-<text x="4" y="182" class="l">Lines deleted</text><text x="356" y="182" class="v" text-anchor="end">-11.1k</text>
+<text x="4" y="78" class="l">Contributions (last year)</text><text x="356" y="78" class="v" text-anchor="end">1,487</text>
+<text x="4" y="104" class="l">Commits (last year)</text><text x="356" y="104" class="v" text-anchor="end">35</text>
+<text x="4" y="130" class="l">Lines of code changed</text><text x="356" y="130" class="v" text-anchor="end">27.3k</text>
+<text x="4" y="156" class="l">Lines added</text><text x="356" y="156" class="v" text-anchor="end">+15.3k</text>
+<text x="4" y="182" class="l">Lines deleted</text><text x="356" y="182" class="v" text-anchor="end">-12.0k</text>
 </svg>
